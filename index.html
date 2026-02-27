@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Safety Pal</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="top-bar">
+            <button class="icon-btn menu-btn">
+                <i data-lucide="menu"></i>
+            </button>
+            <h1 class="app-title">Safety Pal</h1>
+            <div class="header-right">
+                <div class="status-badge">
+                    <span class="status-dot"></span>
+                    LIVE
+                </div>
+                <button class="icon-btn profile-btn">
+                    <i data-lucide="user"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content (Map) -->
+        <main class="active" id="map-page"
+            style="flex: 1; position: relative; width: 100%; display: flex; flex-direction: column;">
+            <div id="map"></div>
+
+            <!-- Floating Search Bar -->
+            <div class="search-bar-container">
+                <div class="search-bar">
+                    <i data-lucide="search" class="search-icon"></i>
+                    <input type="text" placeholder="Search for safe routes or havens...">
+                    <button class="navigate-btn">
+                        <i data-lucide="navigation"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Floating Controls Right -->
+            <div class="map-controls-right">
+                <div class="zoom-controls">
+                    <button class="control-btn" id="zoom-in"><i data-lucide="plus"></i></button>
+                    <div class="divider"></div>
+                    <button class="control-btn" id="zoom-out"><i data-lucide="minus"></i></button>
+                </div>
+                <button class="control-btn layers-btn">
+                    <i data-lucide="layers"></i>
+                </button>
+            </div>
+
+            <!-- Bottom Floating Action Area -->
+            <div class="bottom-action-area">
+                <!-- Report Incident Button -->
+                <button class="report-btn">
+                    <i data-lucide="map-pin"></i>
+                    Report Incident
+                </button>
+
+                <!-- Filters Carousel -->
+                <div class="filters-row">
+                    <button class="filter-pill active">
+                        <i data-lucide="filter"></i>
+                        All Alerts
+                    </button>
+                    <button class="filter-pill">
+                        <div class="icon-circle fire bg-orange">
+                            <i data-lucide="flame"></i>
+                        </div>
+                        Fires
+                    </button>
+                    <button class="filter-pill">
+                        <div class="icon-circle police bg-blue">
+                            <i data-lucide="shield"></i>
+                        </div>
+                        Safety
+                    </button>
+                    <button class="close-filters-btn">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+
+                <!-- Time Slider -->
+                <div class="time-slider-container">
+                    <i data-lucide="play" class="slider-btn play-left"></i>
+                    <div class="slider-track">
+                        <div class="slider-thumb"></div>
+                    </div>
+                    <i data-lucide="play" class="slider-btn play-right"></i>
+                </div>
+            </div>
+        </main>
+
+        <!-- Alerts Page (New) -->
+        <main id="alerts-page" style="display: none; flex: 1; overflow-y: auto; background-color: var(--bg-darker);">
+            <header class="alerts-header">
+                <button class="icon-btn back-btn"><i data-lucide="arrow-left"></i></button>
+                <h2 style="font-size: 1.1rem; flex: 1; text-align: center; color: white;">Incidents</h2>
+                <div class="header-right">
+                    <button class="icon-btn notification-btn">
+                        <i data-lucide="bell"></i>
+                        <span class="notif-dot"></span>
+                    </button>
+                </div>
+            </header>
+
+            <div class="page-content">
+                <div class="search-box">
+                    <i data-lucide="search" style="color: var(--text-muted);"></i>
+                    <input type="text" placeholder="Search incidents..."
+                        style="background: transparent; border: none; color: white; flex: 1; outline: none;">
+                </div>
+
+                <div class="pill-scroll">
+                    <button class="pill-btn active">All Reports</button>
+                    <button class="pill-btn">Theft <i data-lucide="chevron-down"></i></button>
+                    <button class="pill-btn">Safety <i data-lucide="chevron-down"></i></button>
+                    <button class="pill-btn">Status <i data-lucide="chevron-down"></i></button>
+                </div>
+
+                <div class="incidents-container">
+                    <!-- Cards -->
+                    <div class="incident-card">
+                        <div class="card-head">
+                            <div class="type-icon bg-red-trans"><i data-lucide="alert-triangle"
+                                    style="color: var(--accent-red);"></i></div>
+                            <div class="title-meta">
+                                <h3>Suspicious Activity</h3>
+                                <span>Today, 2:45 PM • Oak Street</span>
+                            </div>
+                            <span class="status-pill pending">PENDING</span>
+                        </div>
+                        <p>Unidentified individual seen loitering near residential garages. Carrying a large backpack
+                            and checking car door handles.</p>
+                        <div class="card-foot">
+                            <span><i data-lucide="thumbs-up"></i> 12 Helpful</span>
+                            <span><i data-lucide="message-square"></i> 4 Comments</span>
+                        </div>
+                    </div>
+
+                    <div class="incident-card">
+                        <div class="card-head">
+                            <div class="type-icon bg-orange-trans"><i data-lucide="zap"
+                                    style="color: var(--accent-orange);"></i></div>
+                            <div class="title-meta">
+                                <h3>Severe Pothole</h3>
+                                <span>Yesterday, 10:15 AM • Main St & 5th</span>
+                            </div>
+                            <span class="status-pill progress">IN PROGRESS</span>
+                        </div>
+                        <p>Large pothole in the middle lane causing cars to swerve suddenly. City maintenance team has
+                            been notified.</p>
+                        <div class="card-foot">
+                            <span><i data-lucide="thumbs-up"></i> 45 Helpful</span>
+                            <span><i data-lucide="message-square"></i> 18 Comments</span>
+                        </div>
+                    </div>
+
+                    <div class="incident-card">
+                        <div class="card-head">
+                            <div class="type-icon bg-blue-trans"><i data-lucide="lock" style="color: #3b82f6;"></i>
+                            </div>
+                            <div class="title-meta">
+                                <h3>Bicycle Theft</h3>
+                                <span>Oct 24, 6:00 PM • Central Park</span>
+                            </div>
+                            <span class="status-pill resolved">RESOLVED</span>
+                        </div>
+                        <p>Blue mountain bike stolen from the rack near the north entrance. Security footage was
+                            recovered and shared with police.</p>
+                        <div class="card-foot">
+                            <span><i data-lucide="thumbs-up"></i> 8 Helpful</span>
+                            <span><i data-lucide="message-square"></i> 2 Comments</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="fab-btn"><i data-lucide="plus"></i></button>
+            </div>
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <a href="#" class="nav-item active" id="nav-map">
+                <i data-lucide="map"></i>
+                <span>MAP</span>
+            </a>
+            <a href="#" class="nav-item" id="nav-alerts">
+                <i data-lucide="bell"></i>
+                <span>ALERTS</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i data-lucide="shield"></i>
+                <span>ZONES</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i data-lucide="settings"></i>
+                <span>SETUP</span>
+            </a>
+        </nav>
+    </div>
+
+    </div>
+
+    <!-- Report Incident Modal -->
+    <div class="modal-overlay">
+        <div class="report-modal">
+            <div class="modal-header">
+                <h3 style="color: white; font-weight: 600;">Report Incident</h3>
+                <button class="close-modal"><i data-lucide="x"></i></button>
+            </div>
+            <div class="incident-grid">
+                <div class="incident-option selected" data-type="fire">
+                    <div class="type-icon bg-orange-trans"><i data-lucide="flame"
+                            style="color: var(--accent-orange);"></i></div>
+                    <span style="font-size: 0.8rem; font-weight: 500;">Fire</span>
+                </div>
+                <div class="incident-option" data-type="police">
+                    <div class="type-icon bg-blue-trans"><i data-lucide="shield" style="color: #3b82f6;"></i></div>
+                    <span style="font-size: 0.8rem; font-weight: 500;">Police</span>
+                </div>
+                <div class="incident-option" data-type="medical">
+                    <div class="type-icon bg-red-trans"><i data-lucide="briefcase-medical"
+                            style="color: var(--accent-red);"></i></div>
+                    <span style="font-size: 0.8rem; font-weight: 500;">Medical</span>
+                </div>
+                <div class="incident-option" data-type="accident">
+                    <div class="type-icon bg-orange-trans"><i data-lucide="alert-triangle"
+                            style="color: var(--accent-yellow);"></i></div>
+                    <span style="font-size: 0.8rem; font-weight: 500;">Accident</span>
+                </div>
+            </div>
+            <button class="submit-report-btn">Submit Report</button>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- App JS -->
+    <script src="app.js"></script>
+</body>
+
+</html>
