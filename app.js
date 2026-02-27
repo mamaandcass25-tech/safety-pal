@@ -65,16 +65,39 @@ document.addEventListener("DOMContentLoaded", function () {
     // Ensure icons in markers are rendered
     setTimeout(refreshIcons, 100);
 
-    // 3. Search Bar Interaction
+    // 3. Global Search Functionality using Nominatim API
     const searchInput = document.querySelector('.search-bar input');
-    searchInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            const query = searchInput.value.toLowerCase();
-            if (query.includes('san francisco')) map.setView([37.7749, -122.4194], 14);
-            else if (query.includes('fisherman')) map.setView([37.8080, -122.4177], 15);
-            else if (query.includes('mission')) map.setView([37.7599, -122.4148], 15);
+    const searchIcon = document.querySelector('.search-icon');
+    const navigateBtn = document.querySelector('.navigate-btn');
+
+    async function performSearch() {
+        const query = searchInput.value.trim();
+        if (!query) return;
+
+        try {
+            const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
+            const data = await response.json();
+
+            if (data && data.length > 0) {
+                const result = data[0];
+                const lat = parseFloat(result.lat);
+                const lon = parseFloat(result.lon);
+                map.setView([lat, lon], 14);
+            } else {
+                alert("Location not found. Please try another search.");
+            }
+        } catch (error) {
+            console.error("Search error:", error);
+            alert("Unable to search at the moment. Please try again later.");
         }
+    }
+
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') performSearch();
     });
+
+    searchIcon.addEventListener('click', performSearch);
+    navigateBtn.addEventListener('click', performSearch);
 
     // 4. Report Incident Logic
     const reportBtn = document.querySelector('.report-btn');
